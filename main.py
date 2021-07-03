@@ -3,12 +3,8 @@ from math import cos, pi, sin, tau
 
 import vpython as vp
 from vpython import vec
-# from vpython import canvas, mag, vec, box
 
-if os.name == "posix":
-    scene = vp.canvas(width=950, height=1870)
-else:
-    scene = vp.canvas(width=1500, height=690)
+scene = vp.canvas(width=1500, height=690)
 
 width = 16
 depth = 16
