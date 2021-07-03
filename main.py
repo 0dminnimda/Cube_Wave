@@ -20,7 +20,7 @@ centering_shift = (
 )
 
 box_size = vec(1, 1, 1)
-box_size /= 1.1
+box_size /= 1.1  # each box is slightly separated from the others
 box_size /= scale
 
 boxes = []
@@ -40,6 +40,7 @@ time_change = -0.225
 height_multiplier = 6
 
 while 1:
+    vp.rate(45)
     for line_of_boxes in boxes:
         for box in line_of_boxes:
             ang = (box.pos.mag**2 + time) / sin_scale
