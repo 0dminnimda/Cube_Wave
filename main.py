@@ -1,5 +1,4 @@
-import os
-from math import cos, pi, sin, tau
+from math import pi, sin
 
 import vpython as vp
 from vpython import vec
@@ -36,7 +35,7 @@ time_change = -0.225
 height_multiplier = 6
 
 while 1:
-    vp.rate(45)
+    vp.rate(45)  # comment out to remove the update restriction
     for line_of_boxes in boxes:
         for box in line_of_boxes:
             ang = (box.pos.mag**2 + time) / sin_scale
