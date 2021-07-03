@@ -1,32 +1,51 @@
-from vpython import *
-from math import sin, cos, tau, pi
 import os
+from math import cos, pi, sin, tau
+
+import vpython as vp
+from vpython import vec
+# from vpython import canvas, mag, vec, box
 
 if os.name == "posix":
-    scene = canvas(width=950, height=1870)
+    scene = vp.canvas(width=950, height=1870)
 else:
-    scene = canvas(width=1500, height=690)
+    scene = vp.canvas(width=1500, height=690)
 
-widt = 16
-dept = 16
-a = 1.1
+width = 16
+depth = 16
+
+scale = 1
+centering_shift = (
+    - vec(width, 0, depth) / 2  # move the center of the shape to the origin
+    + vec(1, 0, 1) / 2  # shift to the exact center from the center of the box
+)
+
+box_size = vec(1, 1, 1)
+box_size /= 1.1
+box_size /= scale
 
 boxes = []
-for i in range(widt):
+for i in range(width):
     boxes.append([])
-    for j in range(dept):
-        v = vec(i-widt/2+0.5, 0, j-dept/2+0.5)*a
-        boxes[i].append(box(pos=v))
-        boxes[i][j].rotate(pi*0.25, axis=vec(0, 1, 0), origin=vec(0, 0, 0))
-        boxes[i][j].rotate(pi*0.2, axis=vec(1, 0, 0), origin=vec(0, 0, 0))
+    for j in range(depth):
+        box = vp.box(size=box_size)
+        box.pos = (vec(i, 0, j) + centering_shift) / scale
+        box.rotate(pi*0.25, axis=vec(0, 1, 0), origin=vec(0, 0, 0))
+        box.rotate(pi*0.2, axis=vec(1, 0, 0), origin=vec(0, 0, 0))
+        boxes[i].append(box)
 
-a = 0
-h = 0.5
+time = 0
+min_height = 0.5
+sin_scale = 30
+time_change = -0.225
+height_multiplier = 6
 
 while 1:
-    for i in range(widt):
-        for j in range(dept):
-            d = mag(boxes[i][j].pos)**2
-            boxes[i][j].height = (1 + h + sin((d+a)/30))*6
+    for line_of_boxes in boxes:
+        for box in line_of_boxes:
+            ang = (box.pos.mag**2 + time) / sin_scale
+            box.height = (
+                1 + sin(ang)  # from 0 to 2
+                + min_height
+            ) * height_multiplier / scale
 
-    a -= 0.225
+    time += time_change
