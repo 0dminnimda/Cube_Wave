@@ -5,6 +5,10 @@ from typing import Iterator, Tuple
 _STEM = "{stem} ({id})"
 _PATTERN = re.compile(r"^(.+) \((\d+)\)$")
 
+_THE_IMPOSSIBLE_BECAME_POSSIBLE = FileExistsError(
+    "All possible options have been exhausted,"
+    " it is impossible to create a unique name.")
+
 
 class UniquePathIterator:
     def __init__(self, path: Path = Path(),
@@ -75,3 +79,21 @@ class UniquePathIterator:
 
         return self.path
 
+
+def last_unique_path(path: Path) -> Path:
+    upi = UniquePathIterator(path)
+    for path in upi:
+        if not path.exists():
+            return upi.path_with_id(upi.id - 1)
+
+    # unreachable code
+    raise _THE_IMPOSSIBLE_BECAME_POSSIBLE
+
+
+def unique_path(path: Path) -> Path:
+    for path in UniquePathIterator(path):
+        if not path.exists():
+            return path
+
+    # unreachable code
+    raise _THE_IMPOSSIBLE_BECAME_POSSIBLE
