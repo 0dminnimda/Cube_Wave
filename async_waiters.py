@@ -5,13 +5,15 @@ from typing import Callable
 
 class Waiter:
     def __init__(self, fucntion: Callable[[], bool],
+                 interval: float = 0.1,
                  timeout: float = 1.) -> None:
         self.fucntion = fucntion
+        self.interval = interval
         self.timeout = timeout
 
     async def wait_without_timeout(self) -> bool:
         while not self.fucntion():
-            await sleep(self.timeout)
+            await sleep(self.interval)
 
         return True
 
@@ -26,9 +28,11 @@ class Waiter:
 
 class PathWaiter(Waiter):
     def __init__(self, path: Path = Path().cwd(),
+                 interval: float = 0.1,
                  timeout: float = 1.) -> None:
         self.path = path
         super().__init__(self.does_the_path_exist,
+                         interval=interval,
                          timeout=timeout)
 
     def does_the_path_exist(self) -> bool:
