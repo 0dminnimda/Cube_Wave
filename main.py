@@ -211,15 +211,17 @@ class Renderer:
 
 
 if __name__ == "__main__":
-    print("setting up Renderer")
+    print("setting up")
     scene = vp.canvas(width=3840, height=2160)
+
+    animator = Animator(scene=scene)
+    animator.init()
 
     renderer = Renderer(
         scene=scene,
         duration=1.,  # in seconds
         # fps=60,
     )
-    renderer.init()
 
     print("creating frames")
     start = time()
