@@ -65,6 +65,10 @@ class Animator:
 
         self.scene.range = 16
 
+    @property
+    def cycle(self) -> float:
+        return 2 * pi * self.sin_scale  # 2π is the period of sin
+
     def next_frame(self) -> None:
         self._iteration += 1
         if self.rate is not None:
