@@ -83,3 +83,121 @@ class Animator:
         if self.wait_for_rendering_at_every_step:
             self.scene.waitfor("draw_complete")
 
+
+@dataclass
+class FramePath:
+    path: Path
+
+
+@dataclass
+class Renderer(Animator):
+    duration: float = 0.  # in seconds
+    fps: int = 60
+
+    save_dir: Path = Path("animation_frames")
+    downloads: Path = Path.home() / "Downloads"
+
+    frame_paths: List[FramePath] = field(init=False, default_factory=list)
+    not_found_frame_paths: List[FramePath] = field(
+        init=False, default_factory=list)
+
+    path_waiter: PathWaiter = PathWaiter(interval=0.25, timeout=5.)
+
+    def frame_name(self) -> str:
+        return f"{self.name}_{self._iteration}.png"
+
+    @property
+    def number_of_frames(self) -> int:
+        return int(self.duration * self.fps)
+
+    def set_number_of_frames_via_duration(self, number_of_frames: int) -> None:
+        # adding 0.1 so that no inaccuracies make a mistake
+        self.duration = (number_of_frames + 0.1) / self.fps
+
+    def clear_frame_paths(self) -> None:
+        self.frame_paths.clear()
+        self.not_found_frame_paths.clear()
+
+    def download_frame(self) -> Path:
+        path = self.downloads / self.frame_name()
+        path = unique_path(path)
+
+        self.scene.capture(path.name)
+        return path
+
+    def move_frame(self, path: Path) -> Tuple[bool, Path]:
+        return run(self.move_frame_async(path))
+
+    async def move_frame_async(self, path: Path) -> Tuple[bool, Path]:
+        self.path_waiter.path = path
+        if await self.path_waiter.wait():
+            new_path = unique_path(self.save_dir / self.frame_name())
+            path.rename(new_path)
+            return True, new_path
+
+        return False, path
+
+    async def _advance_and_save(self) -> None:
+        # using one class, we take advantage of the fact that
+        # this is only one instance, whose fields we can change
+        frame_path = FramePath(self.download_frame())
+        self.frame_paths.append(frame_path)
+
+        self.next_frame()
+        success, path = await self.move_frame_async(frame_path.path)
+        if success:
+            frame_path.path = path
+        else:
+            self.not_found_frame_paths.append(frame_path)
+
+    def create_frames(self) -> None:
+        return run(self.create_frames_async())
+
+    async def create_frames_async(self) -> None:
+        self.clear_frame_paths()
+
+        if not self.save_dir.exists():
+            self.save_dir.mkdir()
+
+        for _ in range(self.number_of_frames):
+            await self._advance_and_save()
+
+    async def _move_and_handle_frame_async(self,
+                                           frame_path: FramePath) -> None:
+        success, path = await self.move_frame_async(frame_path.path)
+        if success:
+            frame_path.path = path
+        else:
+            raise FileNotFoundError(
+                f"frame path '{path}' does not exist,"
+                " although it should be downloaded")
+
+    def build_animation(self, ext: str = ".avi", codec: str = "DIVX") -> None:
+        return run(self.build_animation_async(ext=ext, codec=codec))
+
+    async def build_animation_async(self, ext: str = ".avi",
+                                    codec: str = "DIVX") -> None:
+        tasks = (self._move_and_handle_frame_async(path)
+                 for path in self.not_found_frame_paths)
+        await gather(*tasks)
+
+        out = cv.VideoWriter(
+            self.name + ext, cv.VideoWriter_fourcc(*codec),
+            self.fps, self._shape())
+
+        try:
+            for frame_path in self.frame_paths:
+                out.write(cv.imread(str(frame_path.path)))
+        finally:
+            out.release()
+
+    def remove_frames(self):
+        for frame_path in self.frame_paths:
+            try:
+                frame_path.path.unlink(missing_ok=False)
+            except FileNotFoundError:
+                warnings.warn(f"{frame_path.path} does not exist"
+                              " so it won't be deleted")
+
+        self.clear_frame_paths()
+
