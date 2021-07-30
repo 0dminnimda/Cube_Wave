@@ -218,8 +218,8 @@ if __name__ == "__main__":
     animator.init()
 
     renderer = Renderer(
-        scene=scene,
-        duration=1.,  # in seconds
+        animator,
+        duration=2.,  # in seconds
         # fps=60,
     )
     # full cycle for every second of rendering.duration
