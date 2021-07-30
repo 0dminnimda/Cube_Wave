@@ -84,7 +84,10 @@ def last_unique_path(path: Path) -> Path:
     upi = UniquePathIterator(path)
     for path in upi:
         if not path.exists():
-            return upi.path_with_id(upi.id - 1)
+            if upi.id == upi.default_id:
+                return path
+            else:
+                return upi.path_with_id(upi.id - 1)
 
     # unreachable code
     raise _THE_IMPOSSIBLE_BECAME_POSSIBLE
