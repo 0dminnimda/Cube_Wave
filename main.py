@@ -94,7 +94,9 @@ class FramePath:
 
 
 @dataclass
-class Renderer(Animator):
+class Renderer:
+    animator: Animator
+
     duration: float = 0.  # in seconds
     fps: int = 60
 
@@ -107,8 +109,10 @@ class Renderer(Animator):
 
     path_waiter: PathWaiter = PathWaiter(interval=0.25, timeout=5.)
 
-    def frame_name(self) -> str:
-        return f"{self.name}_{self._iteration}.png"
+    def frame_name(self, iteration: Optional[int] = None) -> str:
+        if iteration is None:
+            iteration = self.animator._iteration
+        return f"{self.animator.name}_{iteration}.png"
 
     @property
     def number_of_frames(self) -> int:
@@ -126,7 +130,7 @@ class Renderer(Animator):
         path = self.downloads / self.frame_name()
         path = unique_path(path)
 
-        self.scene.capture(path.name)
+        self.animator.scene.capture(path.name)
         return path
 
     def move_frame(self, path: Path) -> Tuple[bool, Path]:
@@ -147,7 +151,7 @@ class Renderer(Animator):
         frame_path = FramePath(self.download_frame())
         self.frame_paths.append(frame_path)
 
-        self.next_frame()
+        self.animator.next_frame()
         success, path = await self.move_frame_async(frame_path.path)
         if success:
             frame_path.path = path
@@ -186,8 +190,8 @@ class Renderer(Animator):
         await gather(*tasks)
 
         out = cv.VideoWriter(
-            self.name + ext, cv.VideoWriter_fourcc(*codec),
-            self.fps, self._shape())
+            self.animator.name + ext, cv.VideoWriter_fourcc(*codec),
+            self.fps, self.animator._shape())
 
         try:
             for frame_path in self.frame_paths:
