@@ -201,3 +201,25 @@ class Renderer(Animator):
 
         self.clear_frame_paths()
 
+
+if __name__ == "__main__":
+    print("setting up Renderer")
+    scene = vp.canvas(width=3840, height=2160)
+
+    renderer = Renderer(
+        scene=scene,
+        duration=1.,  # in seconds
+        # fps=60,
+    )
+    renderer.init()
+
+    print("creating frames")
+    start = time()
+    renderer.create_frames()
+    print("create_frames run time:", time() - start)
+    print("building animation")
+    renderer.build_animation()
+    print("removing frames")
+    renderer.remove_frames()
+    print("done")
+
