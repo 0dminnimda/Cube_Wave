@@ -222,6 +222,14 @@ if __name__ == "__main__":
         duration=1.,  # in seconds
         # fps=60,
     )
+    # full cycle for every second of rendering.duration
+    total_time_change = animator.cycle * renderer.duration
+    animator.time_step = total_time_change / renderer.number_of_frames
+
+    # remove the last frame as it must be
+    # a frame before repeating the animation
+    renderer.set_number_of_frames_via_duration(
+        renderer.number_of_frames - 1)
 
     print("creating frames")
     start = time()
