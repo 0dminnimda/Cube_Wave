@@ -12,7 +12,7 @@ import vpython as vp
 from vpython import vec
 
 from async_waiters import PathWaiter
-from unique_paths import unique_path
+from unique_paths import last_unique_path, unique_path
 
 
 @dataclass
@@ -209,6 +209,11 @@ class Renderer:
 
         self.clear_frame_paths()
 
+    def use_latest_frames_from(self, directory: Path):
+        for i in range(self.number_of_frames):
+            last_path = last_unique_path(directory / self.frame_name(i))
+            self.frame_paths.append(FramePath(last_path))
+
 
 if __name__ == "__main__":
     print("setting up")
@@ -231,10 +236,14 @@ if __name__ == "__main__":
     renderer.set_number_of_frames_via_duration(
         renderer.number_of_frames - 1)
 
-    print("creating frames")
-    start = time()
-    renderer.create_frames()
-    print("create_frames run time:", time() - start)
+    if 1:
+        print("creating frames")
+        start = time()
+        renderer.create_frames()
+        print("create_frames run time:", time() - start)
+    else:
+        print("using created frames")
+        renderer.use_latest_frames_from(renderer.save_dir)
     print("building animation")
     renderer.build_animation()
     print("removing frames")
