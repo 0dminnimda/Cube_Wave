@@ -38,7 +38,7 @@ class Animator:
     name: str = "cube_wave_animation"
     wait_for_rendering_at_every_step: bool = True
 
-    def _shape(self):
+    def _shape(self) -> Tuple[int, int]:
         return self.scene.width, self.scene.height
 
     def init(self) -> None:
@@ -199,7 +199,7 @@ class Renderer:
         finally:
             out.release()
 
-    def remove_frames(self):
+    def remove_frames(self) -> None:
         for frame_path in self.frame_paths:
             try:
                 frame_path.path.unlink(missing_ok=False)
@@ -209,7 +209,7 @@ class Renderer:
 
         self.clear_frame_paths()
 
-    def use_latest_frames_from(self, directory: Path):
+    def use_latest_frames_from(self, directory: Path) -> None:
         for i in range(self.number_of_frames):
             last_path = last_unique_path(directory / self.frame_name(i))
             self.frame_paths.append(FramePath(last_path))
