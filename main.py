@@ -214,6 +214,13 @@ class Renderer:
             last_path = last_unique_path(directory / self.frame_name(i))
             self.frame_paths.append(FramePath(last_path))
 
+    def set_number_of_seconds_per_cycle(self, number: float) -> None:
+        # full cycle for every <number> seconds
+        frames_per_cycle = number * self.fps
+        self.animator.time_step = self.animator.cycle / frames_per_cycle
+        # total time change = cycle * duration / number
+        # time step = total time change / number of frames
+        # duration / number of frames = 1 / fps
 
 if __name__ == "__main__":
     print("setting up")
@@ -227,9 +234,7 @@ if __name__ == "__main__":
         duration=2.,  # in seconds
         # fps=60,
     )
-    # full cycle for every second of rendering.duration
-    total_time_change = animator.cycle * renderer.duration
-    animator.time_step = total_time_change / renderer.number_of_frames
+    renderer.set_number_of_seconds_per_cycle(2.)
 
     # remove the last frame as it must be
     # a frame before repeating the animation
