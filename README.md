@@ -8,7 +8,7 @@ Inspiered by [this GIF](https://beesandbombs.tumblr.com/post/149654056864/cube-w
 
 Animation (click on image):
 
-[![Animation](https://img.youtube.com/vi/LUp-k7q_8I0/0.jpg)](https://www.youtube.com/watch?v=LUp-k7q_8I0/?target=_blank)
+[![Animation](https://img.youtube.com/vi/LUp-k7q_8I0/0.jpg)](https://www.youtube.com/watch?v=LUp-k7q_8I0)
 
 You can also see it in action by running the `main.py`  
 To just play / watch the animation, download the [simple version](https://github.com/0dminnimda/Cube_Wave/releases/tag/2021.07.19)  
