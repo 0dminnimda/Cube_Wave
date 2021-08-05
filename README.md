@@ -13,7 +13,7 @@ Animation (click on image):
 You can also see it in action by running the `main.py`  
 To just play / watch the animation, download the [simple version](https://github.com/0dminnimda/Cube_Wave/releases/tag/2021.07.19)  
 Try changing some parameters, it's pretty interesting to see the result!  
-But if you want consistent video output, download this version with Renderer  
+But if you want consistent video output, download this [version with Renderer](https://github.com/0dminnimda/Cube_Wave/releases/tag/2021.08.05)  
 
 ## Snapshots
 
